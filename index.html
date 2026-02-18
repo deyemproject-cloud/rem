@@ -3,254 +3,378 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RealEstateMilano - Immobili di Prestigio</title>
+    <title>RealEstateMilano Pro | Immobili di Prestigio</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #1a1a1a;
+            --accent: #c9a962;
+            --accent-light: #e8d5a3;
+            --text: #2d3436;
+            --text-light: #636e72;
+        }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background: #f8f9fa; color: var(--text); }
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 5px; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+        .gradient-text {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
 </head>
-<body style="margin:0;font-family:Inter,sans-serif;background:#f5f5f5;color:#333">
-    
-    <nav id="navbar" style="position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.5rem 4rem;display:flex;justify-content:space-between;align-items:center;background:transparent;transition:all 0.4s">
-        <a href="#" style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:600;color:white;text-decoration:none">🏠 RealEstateMilano</a>
-        <div style="display:flex;gap:2rem">
-            <a href="#home" style="color:white;text-decoration:none;font-weight:500">Home</a>
-            <a href="#vendite" style="color:white;text-decoration:none;font-weight:500">Vendite</a>
-            <a href="#contatti" style="color:white;text-decoration:none;font-weight:500">Contatti</a>
-            <a href="#contatti" style="background:#c9a962;color:white;padding:0.75rem 1.5rem;border-radius:50px;text-decoration:none;font-weight:600">Contattaci</a>
-        </div>
-    </nav>
-
-    <section id="home" style="height:100vh;background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.4)),url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920') center/cover;display:flex;align-items:center;justify-content:center;text-align:center;color:white">
-        <div style="max-width:900px;padding:0 2rem">
-            <p style="color:#c9a962;text-transform:uppercase;letter-spacing:4px;margin-bottom:1.5rem">Agenzia Immobiliare a Milano</p>
-            <h1 style="font-family:'Playfair Display',serif;font-size:5rem;margin-bottom:1.5rem;line-height:1.1">Trova la Casa dei Tuoi Sogni</h1>
-            <p style="font-size:1.3rem;margin-bottom:3rem;opacity:0.9">Specializzati nella compravendita e locazione di immobili di prestigio a Milano e provincia</p>
-            <div style="display:flex;gap:1.5rem;justify-content:center">
-                <a href="#vendite" style="background:#c9a962;color:white;padding:1.25rem 3rem;border-radius:50px;text-decoration:none;font-weight:600">Cerca Immobili</a>
-                <a href="#contatti" style="border:2px solid white;color:white;padding:1.25rem 3rem;border-radius:50px;text-decoration:none;font-weight:600">Richiedi Valutazione</a>
-            </div>
-        </div>
-    </section>
-
-    <section id="vendite" style="padding:6rem 4rem">
-        <div style="text-align:center;margin-bottom:4rem">
-            <p style="color:#c9a962;text-transform:uppercase;letter-spacing:3px;font-weight:600">In Evidenza</p>
-            <h2 style="font-family:'Playfair Display',serif;font-size:3.5rem;color:#1a1a1a;margin-top:1rem">Immobili in Vendita</h2>
-        </div>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+        const { motion, useScroll, useTransform, useInView, AnimatePresence } = window.Motion;
         
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:2.5rem;max-width:1400px;margin:0 auto">
+        // Properties Data
+        const properties = [
+            { id: 1, title: "Trilocale ristrutturato", location: "Via Fortezza, Milano", price: "€249.000", beds: 2, baths: 1, sqm: 65, img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800" },
+            { id: 2, title: "Bilocale Viale Abruzzi", location: "Buenos Aires, Milano", price: "€310.000", beds: 1, baths: 1, sqm: 45, img: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800" },
+            { id: 3, title: "Appartamento Assago", location: "Assago Centro", price: "€425.000", beds: 3, baths: 2, sqm: 110, img: "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=800" },
+            { id: 4, title: "Bilocale zona Bocconi", location: "Porta Romana, Milano", price: "€330.000", beds: 1, baths: 1, sqm: 42, img: "https://images.unsplash.com/photo-1600573472591-ee6c563aaec9?w=800" },
+            { id: 5, title: "Loft Porta Romana", location: "Via Vannucci, Milano", price: "€180.000", beds: 1, baths: 1, sqm: 50, img: "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800" },
+            { id: 6, title: "Appartamento Cefalù", location: "Cefalù, Palermo", price: "€300.000", beds: 3, baths: 1, sqm: 75, img: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=800" }
+        ];
+        
+        // Animated Counter
+        function Counter({ target, suffix = "" }) {
+            const [count, setCount] = useState(0);
+            const ref = useRef(null);
+            const isInView = useInView(ref, { once: true });
             
-            <div style="background:white;border-radius:24px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,0.08);transition:transform 0.3s">
-                <div style="height:300px;overflow:hidden">
-                    <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800" style="width:100%;height:100%;object-fit:cover;transition:transform 0.6s">
-                </div>
-                <div style="padding:2rem">
-                    <div style="font-size:1.75rem;font-weight:800;color:#c9a962;margin-bottom:0.5rem">€249.000</div>
-                    <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.5rem">Trilocale ristrutturato ottimo investimento</h3>
-                    <div style="color:#666;margin-bottom:1rem">📍 Via Fortezza, Viale Monza, Milano</div>
-                    <div style="display:flex;gap:2rem;padding-top:1rem;border-top:1px solid #eee">
-                        <span>🛏️ 2 Camere</span>
-                        <span>🚿 1 Bagno</span>
-                        <span>📐 65 mq</span>
+            useEffect(() => {
+                if (isInView) {
+                    let start = 0;
+                    const end = parseInt(target);
+                    const duration = 2000;
+                    const increment = end / (duration / 16);
+                    const timer = setInterval(() => {
+                        start += increment;
+                        if (start >= end) {
+                            setCount(end);
+                            clearInterval(timer);
+                        } else {
+                            setCount(Math.floor(start));
+                        }
+                    }, 16);
+                    return () => clearInterval(timer);
+                }
+            }, [isInView, target]);
+            
+            return <span ref={ref}>{count}{suffix}</span>;
+        }
+        
+        // Property Card
+        function PropertyCard({ property, index }) {
+            const [hovered, setHovered] = useState(false);
+            const ref = useRef(null);
+            const isInView = useInView(ref, { once: true, margin: "-50px" });
+            
+            return (
+                <motion.div
+                    ref={ref}
+                    initial={{ opacity: 0, y: 60 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    onMouseEnter={() => setHovered(true)}
+                    onMouseLeave={() => setHovered(false)}
+                    style={{
+                        background: 'white',
+                        borderRadius: '24px',
+                        overflow: 'hidden',
+                        boxShadow: hovered ? '0 25px 60px rgba(0,0,0,0.15)' : '0 10px 40px rgba(0,0,0,0.08)',
+                        transform: hovered ? 'translateY(-12px)' : 'translateY(0)',
+                        transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                    }}
+                >
+                    <div style={{ position: 'relative', height: '280px', overflow: 'hidden' }}>
+                        <motion.img
+                            src={property.img}
+                            alt={property.title}
+                            animate={{ scale: hovered ? 1.1 : 1 }}
+                            transition={{ duration: 0.6 }}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                        <div style={{
+                            position: 'absolute',
+                            top: '1rem',
+                            left: '1rem',
+                            background: 'var(--accent)',
+                            color: 'white',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '50px',
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
+                            textTransform: 'uppercase'
+                        }}>Vendita</div>
                     </div>
-                </div>
-            </div>
-
-            <div style="background:white;border-radius:24px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,0.08);transition:transform 0.3s">
-                <div style="height:300px;overflow:hidden">
-                    <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800" style="width:100%;height:100%;object-fit:cover">
-                </div>
-                <div style="padding:2rem">
-                    <div style="font-size:1.75rem;font-weight:800;color:#c9a962;margin-bottom:0.5rem">€310.000</div>
-                    <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.5rem">Bilocale ristrutturato in Viale Abruzzi</h3>
-                    <div style="color:#666;margin-bottom:1rem">📍 Viale Abruzzi, Buenos Aires, Milano</div>
-                    <div style="display:flex;gap:2rem;padding-top:1rem;border-top:1px solid #eee">
-                        <span>🛏️ 1 Camera</span>
-                        <span>🚿 1 Bagno</span>
-                        <span>📐 45 mq</span>
+                    <div style={{ padding: '1.5rem' }}>
+                        <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent)', marginBottom: '0.5rem' }}>{property.price}</div>
+                        <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>{property.title}</h3>
+                        <div style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem' }}>📍 {property.location}</div>
+                        <div style={{ display: 'flex', gap: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #eee', fontSize: '0.85rem', color: '#666' }}>
+                            <span>🛏️ {property.beds}</span>
+                            <span>🚿 {property.baths}</span>
+                            <span>📐 {property.sqm}mq</span>
+                        </div>
                     </div>
+                </motion.div>
+            );
+        }
+        
+        // Main App
+        function App() {
+            const [scrolled, setScrolled] = useState(false);
+            const { scrollYProgress } = useScroll();
+            const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
+            
+            useEffect(() => {
+                const handleScroll = () => setScrolled(window.scrollY > 50);
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+            
+            return (
+                <div>
+                    {/* Progress Bar */}
+                    <motion.div
+                        style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            height: '4px',
+                            background: 'var(--accent)',
+                            transformOrigin: '0%',
+                            scaleX,
+                            zIndex: 9999
+                        }}
+                    />
+                    
+                    {/* Navigation */}
+                    <motion.nav
+                        initial={{ y: -100 }}
+                        animate={{ y: 0 }}
+                        transition={{ duration: 0.8 }}
+                        style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            zIndex: 1000,
+                            padding: scrolled ? '1rem 2rem' : '1.5rem 2rem',
+                            background: scrolled ? 'rgba(255,255,255,0.95)' : 'transparent',
+                            backdropFilter: scrolled ? 'blur(20px)' : 'none',
+                            boxShadow: scrolled ? '0 4px 30px rgba(0,0,0,0.1)' : 'none',
+                            transition: 'all 0.4s'
+                        }}
+                    >
+                        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <a href="#" style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.8rem', fontWeight: 600, color: scrolled ? '#1a1a1a' : 'white', textDecoration: 'none' }}>
+                                🏠 RealEstate<span style={{ color: 'var(--accent)' }}>Milano</span>
+                            </a>
+                            <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+                                {['Home', 'Immobili', 'Servizi', 'Contatti'].map((item, i) => (
+                                    <motion.a
+                                        key={item}
+                                        href={`#${item.toLowerCase()}`}
+                                        initial={{ opacity: 0, y: -20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: i * 0.1 }}
+                                        style={{ color: scrolled ? '#333' : 'white', textDecoration: 'none', fontWeight: 500 }}
+                                        whileHover={{ color: '#c9a962' }}
+                                    >{item}</motion.a>
+                                ))}
+                                <motion.a
+                                    href="#contatti"
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    style={{
+                                        background: 'linear-gradient(135deg, #c9a962, #e8d5a3)',
+                                        color: 'white',
+                                        padding: '0.75rem 1.5rem',
+                                        borderRadius: '50px',
+                                        textDecoration: 'none',
+                                        fontWeight: 600
+                                    }}
+                                >Contattaci</motion.a>
+                            </div>
+                        </div>
+                    </motion.nav>
+                    
+                    {/* Hero Section */}
+                    <section style={{
+                        minHeight: '100vh',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'linear-gradient(135deg, rgba(26,26,26,0.85) 0%, rgba(26,26,26,0.6) 100%), url(https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920)',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        color: 'white',
+                        textAlign: 'center',
+                        padding: '0 2rem'
+                    }}>
+                        <div style={{ maxWidth: '900px' }}>
+                            <motion.div
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8 }}
+                                style={{ display: 'inline-block', background: 'rgba(201,169,98,0.2)', border: '1px solid #c9a962', padding: '0.75rem 1.5rem', borderRadius: '50px', marginBottom: '2rem', color: '#c9a962', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '3px', fontSize: '0.85rem' }}
+                            >✦ Agenzia dal 2008</motion.div>
+                            
+                            <motion.h1
+                                initial={{ opacity: 0, y: 50 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, delay: 0.2 }}
+                                style={{ fontSize: 'clamp(3rem, 8vw, 5rem)', fontWeight: 600, marginBottom: '1.5rem', lineHeight: 1.1 }}
+                            >Trova la <span className="gradient-text">Casa</span><br />dei Tuoi Sogni</motion.h1>
+                            
+                            <motion.p
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, delay: 0.4 }}
+                                style={{ fontSize: '1.3rem', opacity: 0.95, marginBottom: '3rem', maxWidth: '700px', marginLeft: 'auto', marginRight: 'auto' }}
+                            >Specializzati nella compravendita e locazione di immobili di prestigio a Milano e provincia.</motion.p>
+                            
+                            <motion.div
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, delay: 0.6 }}
+                                style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', flexWrap: 'wrap' }}
+                            >
+                                <motion.a href="#immobili" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} style={{ background: 'linear-gradient(135deg, #c9a962, #e8d5a3)', color: 'white', padding: '1.25rem 3rem', borderRadius: '50px', textDecoration: 'none', fontWeight: 600, fontSize: '1.1rem', boxShadow: '0 4px 20px rgba(201,169,98,0.3)' }}>🔍 Cerca Immobili</motion.a>
+                                <motion.a href="#contatti" whileHover={{ scale: 1.05, background: 'white', color: '#1a1a1a' }} whileTap={{ scale: 0.95 }} style={{ background: 'transparent', color: 'white', border: '2px solid rgba(255,255,255,0.5)', padding: '1.25rem 3rem', borderRadius: '50px', textDecoration: 'none', fontWeight: 600, fontSize: '1.1rem' }}>📞 Richiedi Valutazione</motion.a>
+                            </motion.div>
+                        </div>
+                    </section>
+                    
+                    {/* Stats Section */}
+                    <section style={{ background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)', color: 'white', padding: '6rem 2rem' }}>
+                        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '4rem', textAlign: 'center' }}>
+                            {[
+                                { value: 500, suffix: '+', label: 'Immobili Venduti' },
+                                { value: 15, suffix: '', label: 'Anni di Esperienza' },
+                                { value: 98, suffix: '%', label: 'Clienti Soddisfatti' },
+                                { value: 24, suffix: 'h', label: 'Supporto Clienti' }
+                            ].map((stat, i) => (
+                                <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: i * 0.1 }}
+                                    viewport={{ once: true }}
+                                >
+                                    <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '4rem', fontWeight: 600, color: '#c9a962', marginBottom: '0.5rem' }}>
+                                        <Counter target={stat.value} suffix={stat.suffix} />
+                                    </div>
+                                    <div style={{ fontSize: '1rem', opacity: 0.9, textTransform: 'uppercase', letterSpacing: '2px' }}>{stat.label}</div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </section>
+                    
+                    {/* Properties Section */}
+                    <section id="immobili" style={{ padding: '8rem 2rem' }}>
+                        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+                            <motion.div
+                                initial={{ opacity: 0, y: 40 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                style={{ textAlign: 'center', marginBottom: '5rem' }}
+                            >
+                                <span style={{ display: 'inline-block', color: '#c9a962', textTransform: 'uppercase', letterSpacing: '3px', fontSize: '0.9rem', fontWeight: 700, marginBottom: '1rem', padding: '0.5rem 1rem', background: 'rgba(201,169,98,0.1)', borderRadius: '50px' }}>In Evidenza</span>
+                                <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', color: '#1a1a1a', marginBottom: '1rem' }}>Immobili in <span className="gradient-text">Vendita</span></h2>
+                                <p style={{ fontSize: '1.2rem', color: '#666', maxWidth: '600px', margin: '0 auto' }}>Scopri la nostra selezione di proprietà esclusive a Milano e dintorni</p>
+                            </motion.div>
+                            
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '2.5rem' }}>
+                                {properties.map((property, index) => (
+                                    <PropertyCard key={property.id} property={property} index={index} />
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                    
+                    {/* Services */}
+                    <section id="servizi" style={{ padding: '8rem 2rem', background: 'white' }}>
+                        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+                            <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: '5rem' }}>
+                                <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', color: '#1a1a1a', marginBottom: '1rem' }}>I Nostri <span className="gradient-text">Servizi</span></h2>
+                            </motion.div>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2.5rem' }}>
+                                {[
+                                    { icon: '🏠', title: 'Compravendita', desc: 'Ti accompagniamo in ogni fase dell\'acquisto o vendita del tuo immobile.' },
+                                    { icon: '🔑', title: 'Locazione', desc: 'Gestiamo la locazione con contratti certi e inquilini affidabili.' },
+                                    { icon: '📊', title: 'Valutazione', desc: 'Valutiamo il tuo immobile per ottenere il miglior prezzo di mercato.' }
+                                ].map((service, i) => (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ opacity: 0, y: 40 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: i * 0.1 }}
+                                        viewport={{ once: true }}
+                                        whileHover={{ y: -10, boxShadow: '0 30px 60px rgba(0,0,0,0.12)' }}
+                                        style={{ background: '#f8f9fa', padding: '3rem', borderRadius: '24px', textAlign: 'center' }}
+                                    >
+                                        <div style={{ fontSize: '3rem', marginBottom: '1.5rem' }}>{service.icon}</div>
+                                        <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: '#1a1a1a' }}>{service.title}</h3>
+                                        <p style={{ color: '#666', lineHeight: 1.8 }}>{service.desc}</p>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                    
+                    {/* Contact */}
+                    <section id="contatti" style={{ padding: '8rem 2rem', background: 'linear-gradient(135deg, #1a1a1a 0%, #1a1a2e 100%)', color: 'white' }}>
+                        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5rem' }}>
+                            <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+                                <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: '3.5rem', marginBottom: '1.5rem' }}>Contattaci</h2>
+                                <p style={{ opacity: 0.9, marginBottom: '3rem', lineHeight: 1.8 }}>Siamo qui per aiutarti a trovare la casa dei tuoi sogni.</p>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                    {[{ icon: '📍', label: 'Indirizzo', val: 'Via Example 123, Milano' }, { icon: '📞', label: 'Telefono', val: '+39 02 123 4567' }, { icon: '✉️', label: 'Email', val: 'info@realestatemilano.net' }].map((item, i) => (
+                                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                            <div style={{ width: '50px', height: '50px', background: 'rgba(201,169,98,0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem' }}>{item.icon}</div>
+                                            <div><strong>{item.label}</strong><br /><span style={{ opacity: 0.8 }}>{item.val}</span></div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </motion.div>
+                            <motion.div initial={{ opacity: 0, x: 50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} style={{ background: 'white', padding: '3rem', borderRadius: '24px', color: '#333' }}>
+                                <h3 style={{ fontSize: '1.75rem', marginBottom: '2rem', fontWeight: 700 }}>Inviaci un messaggio</h3>
+                                <form>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                        <input type="text" placeholder="Nome" style={{ padding: '1rem', border: '2px solid #e8e8e8', borderRadius: '12px', fontSize: '1rem' }} />
+                                        <input type="text" placeholder="Cognome" style={{ padding: '1rem', border: '2px solid #e8e8e8', borderRadius: '12px', fontSize: '1rem' }} />
+                                    </div>
+                                    <input type="email" placeholder="Email" style={{ width: '100%', padding: '1rem', border: '2px solid #e8e8e8', borderRadius: '12px', fontSize: '1rem', marginBottom: '1rem' }} />
+                                    <textarea placeholder="Messaggio" style={{ width: '100%', padding: '1rem', border: '2px solid #e8e8e8', borderRadius: '12px', fontSize: '1rem', minHeight: '120px', marginBottom: '1rem' }}></textarea>
+                                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="submit" style={{ width: '100%', background: 'linear-gradient(135deg, #c9a962, #e8d5a3)', color: 'white', border: 'none', padding: '1.25rem', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 700, cursor: 'pointer' }}>Invia Messaggio</motion.button>
+                                </form>
+                            </motion.div>
+                        </div>
+                    </section>
+                    
+                    {/* Footer */}
+                    <footer style={{ background: '#0a0a0a', color: 'white', padding: '3rem 2rem', textAlign: 'center' }}>
+                        <p style={{ opacity: 0.5 }}>© 2026 RealEstateMilano. Tutti i diritti riservati.</p>
+                    </footer>
                 </div>
-            </div>
-
-            <div style="background:white;border-radius:24px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,0.08);transition:transform 0.3s">
-                <div style="height:300px;overflow:hidden">
-                    <img src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=800" style="width:100%;height:100%;object-fit:cover">
-                </div>
-                <div style="padding:2rem">
-                    <div style="font-size:1.75rem;font-weight:800;color:#c9a962;margin-bottom:0.5rem">€425.000</div>
-                    <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.5rem">Luminoso appartamento in Assago centro</h3>
-                    <div style="color:#666;margin-bottom:1rem">📍 Via Duccio di Buoninsegna, Assago</div>
-                    <div style="display:flex;gap:2rem;padding-top:1rem;border-top:1px solid #eee">
-                        <span>🛏️ 3 Camere</span>
-                        <span>🚿 2 Bagni</span>
-                        <span>📐 110 mq</span>
-                    </div>
-                </div>
-            </div>
-
-            <div style="background:white;border-radius:24px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,0.08);transition:transform 0.3s">
-                <div style="height:300px;overflow:hidden">
-                    <img src="https://images.unsplash.com/photo-1600573472591-ee6c563aaec9?w=800" style="width:100%;height:100%;object-fit:cover">
-                </div>
-                <div style="padding:2rem">
-                    <div style="font-size:1.75rem;font-weight:800;color:#c9a962;margin-bottom:0.5rem">€330.000</div>
-                    <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.5rem">Bilocale da ristrutturare zona Bocconi</h3>
-                    <div style="color:#666;margin-bottom:1rem">📍 Via Atto Vannucci, Porta Romana, Milano</div>
-                    <div style="display:flex;gap:2rem;padding-top:1rem;border-top:1px solid #eee">
-                        <span>🛏️ 1 Camera</span>
-                        <span>🚿 1 Bagno</span>
-                        <span>📐 42 mq</span>
-                    </div>
-                </div>
-            </div>
-
-            <div style="background:white;border-radius:24px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,0.08);transition:transform 0.3s">
-                <div style="height:300px;overflow:hidden">
-                    <img src="https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800" style="width:100%;height:100%;object-fit:cover">
-                </div>
-                <div style="padding:2rem">
-                    <div style="font-size:1.75rem;font-weight:800;color:#c9a962;margin-bottom:0.5rem">€180.000</div>
-                    <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.5rem">Loft seminterrato in Porta Romana</h3>
-                    <div style="color:#666;margin-bottom:1rem">📍 Via Vannucci, Porta Romana, Milano</div>
-                    <div style="display:flex;gap:2rem;padding-top:1rem;border-top:1px solid #eee">
-                        <span>🛏️ 1 Camera</span>
-                        <span>🚿 1 Bagno</span>
-                        <span>📐 50 mq</span>
-                    </div>
-                </div>
-            </div>
-
-            <div style="background:white;border-radius:24px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,0.08);transition:transform 0.3s">
-                <div style="height:300px;overflow:hidden">
-                    <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=800" style="width:100%;height:100%;object-fit:cover">
-                </div>
-                <div style="padding:2rem">
-                    <div style="font-size:1.75rem;font-weight:800;color:#c9a962;margin-bottom:0.5rem">€300.000</div>
-                    <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.5rem">Appartamento di recente costruzione a Cefalù</h3>
-                    <div style="color:#666;margin-bottom:1rem">📍 Via Roma, Cefalù, Palermo</div>
-                    <div style="display:flex;gap:2rem;padding-top:1rem;border-top:1px solid #eee">
-                        <span>🛏️ 3 Camere</span>
-                        <span>🚿 1 Bagno</span>
-                        <span>📐 75 mq</span>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <section style="background:linear-gradient(135deg,#1a1a1a 0%,#2d2d2d 100%);color:white;padding:6rem 4rem">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:4rem;max-width:1200px;margin:0 auto;text-align:center">
-            <div>
-                <div style="font-family:'Playfair Display',serif;font-size:4.5rem;font-weight:600;color:#c9a962">500+</div>
-                <div style="font-size:1.1rem;opacity:0.9;text-transform:uppercase;letter-spacing:2px">Immobili Venduti</div>
-            </div>
-            <div>
-                <div style="font-family:'Playfair Display',serif;font-size:4.5rem;font-weight:600;color:#c9a962">15</div>
-                <div style="font-size:1.1rem;opacity:0.9;text-transform:uppercase;letter-spacing:2px">Anni di Esperienza</div>
-            </div>
-            <div>
-                <div style="font-family:'Playfair Display',serif;font-size:4.5rem;font-weight:600;color:#c9a962">98%</div>
-                <div style="font-size:1.1rem;opacity:0.9;text-transform:uppercase;letter-spacing:2px">Clienti Soddisfatti</div>
-            </div>
-            <div>
-                <div style="font-family:'Playfair Display',serif;font-size:4.5rem;font-weight:600;color:#c9a962">24h</div>
-                <div style="font-size:1.1rem;opacity:0.9;text-transform:uppercase;letter-spacing:2px">Supporto Clienti</div>
-            </div>
-        </div>
-    </section>
-
-    <section style="padding:6rem 4rem">
-        <div style="text-align:center;margin-bottom:4rem">
-            <p style="color:#c9a962;text-transform:uppercase;letter-spacing:3px;font-weight:600">I Nostri Servizi</p>
-            <h2 style="font-family:'Playfair Display',serif;font-size:3.5rem;color:#1a1a1a;margin-top:1rem">Cosa Offriamo</h2>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:2.5rem;max-width:1200px;margin:0 auto">
-            <div style="background:white;padding:3.5rem 2.5rem;border-radius:24px;text-align:center;transition:transform 0.3s">
-                <div style="font-size:3rem;margin-bottom:1.5rem">🏠</div>
-                <h3 style="font-size:1.5rem;margin-bottom:1rem;color:#1a1a1a">Compravendita</h3>
-                <p style="color:#666;line-height:1.8">Ti accompagniamo in ogni fase dell'acquisto o vendita del tuo immobile, garantendo trasparenza e professionalità.</p>
-            </div>
-            <div style="background:white;padding:3.5rem 2.5rem;border-radius:24px;text-align:center;transition:transform 0.3s">
-                <div style="font-size:3rem;margin-bottom:1.5rem">🔑</div>
-                <h3 style="font-size:1.5rem;margin-bottom:1rem;color:#1a1a1a">Locazione</h3>
-                <p style="color:#666;line-height:1.8">Gestiamo la locazione del tuo immobile con contratti certi e garantiti, selezionando inquilini affidabili.</p>
-            </div>
-            <div style="background:white;padding:3.5rem 2.5rem;border-radius:24px;text-align:center;transition:transform 0.3s">
-                <div style="font-size:3rem;margin-bottom:1.5rem">📊</div>
-                <h3 style="font-size:1.5rem;margin-bottom:1rem;color:#1a1a1a">Valutazione</h3>
-                <p style="color:#666;line-height:1.8">Valutiamo il tuo immobile con criteri di mercato aggiornati per ottenere il miglior prezzo possibile.</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="contatti" style="background:linear-gradient(135deg,#1a1a1a 0%,#1a1a2e 100%);color:white;padding:6rem 4rem">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5rem;max-width:1200px;margin:0 auto">
-            <div>
-                <h2 style="font-family:'Playfair Display',serif;font-size:3.5rem;margin-bottom:1.5rem">Contattaci</h2>
-                <p style="opacity:0.9;margin-bottom:3rem;line-height:1.8;font-size:1.15rem">Siamo qui per aiutarti a trovare la casa dei tuoi sogni. Contattaci per una consulenza gratuita.</p>
-                <div style="display:flex;flex-direction:column;gap:1.5rem">
-                    <div style="display:flex;align-items:center;gap:1rem">
-                        <div style="width:60px;height:60px;background:rgba(201,169,98,0.2);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.5rem">📍</div>
-                        <div><strong>Indirizzo</strong><br><span style="opacity:0.8">Via Example 123, Milano</span></div>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:1rem">
-                        <div style="width:60px;height:60px;background:rgba(201,169,98,0.2);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.5rem">📞</div>
-                        <div><strong>Telefono</strong><br><span style="opacity:0.8">+39 02 123 4567</span></div>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:1rem">
-                        <div style="width:60px;height:60px;background:rgba(201,169,98,0.2);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.5rem">✉️</div>
-                        <div><strong>Email</strong><br><span style="opacity:0.8">info@realestatemilano.net</span></div>
-                    </div>
-                </div>
-            </div>
-            <div style="background:white;padding:3rem;border-radius:24px;color:#333">
-                <h3 style="font-size:1.75rem;margin-bottom:2rem;font-weight:700">Inviaci un messaggio</h3>
-                <form>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
-                        <input type="text" placeholder="Nome" style="padding:1rem;border:2px solid #e8e8e8;border-radius:12px;font-size:1rem">
-                        <input type="text" placeholder="Cognome" style="padding:1rem;border:2px solid #e8e8e8;border-radius:12px;font-size:1rem">
-                    </div>
-                    <input type="email" placeholder="Email" style="width:100%;padding:1rem;border:2px solid #e8e8e8;border-radius:12px;font-size:1rem;margin-bottom:1rem">
-                    <input type="tel" placeholder="Telefono" style="width:100%;padding:1rem;border:2px solid #e8e8e8;border-radius:12px;font-size:1rem;margin-bottom:1rem">
-                    <textarea placeholder="Messaggio" style="width:100%;padding:1rem;border:2px solid #e8e8e8;border-radius:12px;font-size:1rem;min-height:120px;margin-bottom:1rem"></textarea>
-                    <button type="submit" style="width:100%;background:linear-gradient(135deg,#c9a962,#b8944f);color:white;border:none;padding:1.25rem;border-radius:12px;font-size:1.1rem;font-weight:700;cursor:pointer">Invia Messaggio</button>
-                </form>
-            </div>
-        </div>
-    </section>
-
-    <footer style="background:#0a0a0a;color:white;padding:4rem 4rem 2rem">
-        <div style="text-align:center;padding-top:2rem;border-top:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5)">
-            © 2026 RealEstateMilano. Tutti i diritti riservati.
-        </div>
-    </footer>
-
-    <script>
-        window.addEventListener('scroll', () => {
-            const nav = document.getElementById('navbar');
-            if (window.scrollY > 100) {
-                nav.style.background = 'rgba(255,255,255,0.95)';
-                nav.style.backdropFilter = 'blur(20px)';
-                nav.style.boxShadow = '0 4px 30px rgba(0,0,0,0.1)';
-                nav.querySelector('.logo').style.color = '#1a1a1a';
-                nav.querySelectorAll('a:not(.nav-cta)').forEach(a => a.style.color = '#333');
-            } else {
-                nav.style.background = 'transparent';
-                nav.style.backdropFilter = 'none';
-                nav.style.boxShadow = 'none';
-                nav.querySelector('.logo').style.color = 'white';
-                nav.querySelectorAll('a:not(.nav-cta)').forEach(a => a.style.color = 'white');
-            }
-        });
-        document.querySelectorAll('[style*="box-shadow:0 10px 40px"]').forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                card.style.transform = 'translateY(-12px)';
-                card.querySelector('img').style.transform = 'scale(1.1)';
-            });
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = 'translateY(0)';
-                card.querySelector('img').style.transform = 'scale(1)';
-            });
-        });
+            );
+        }
+        
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
     </script>
 </body>
 </html>
